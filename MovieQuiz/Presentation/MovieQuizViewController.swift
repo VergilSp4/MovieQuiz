@@ -3,6 +3,7 @@ import UIKit
 final class MovieQuizViewController: UIViewController {
 
     // MARK: - IBOutlets
+    
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet private weak var imageView: UIImageView!
@@ -26,7 +27,7 @@ final class MovieQuizViewController: UIViewController {
         super.viewDidLoad()
 
         setupQuestionFactory()
-        
+       
         yesButton.layer.cornerRadius = 15
         yesButton.clipsToBounds = true
     }
@@ -114,12 +115,14 @@ final class MovieQuizViewController: UIViewController {
         setupImageView()
         imageView.layer.borderColor =
             isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        isAnswerButtonsEnabled = false
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self else { return }
             self.showNextQuestionOrResults()
-            self.isAnswerButtonsEnabled = true
+            yesButton.isEnabled = true
+            noButton.isEnabled = true
         }
     }
 

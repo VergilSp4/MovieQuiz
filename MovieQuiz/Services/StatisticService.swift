@@ -73,7 +73,7 @@ final class StatisticService: StatisticServiceProtocol {
         gamesCount = gamesCount + 1
 
         let gameResult = GameResult(correct: count, total: amount, date: Date())
-        if gameResult.isBetterThan(bestGame) {
+        if bestGame.total == 0 || gameResult.isBetterThan(bestGame) {
             bestGame = gameResult
         }
 
