@@ -9,6 +9,7 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
 
     // MARK: - Properties
 
@@ -25,11 +26,17 @@ final class MovieQuizViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        setupQuestionFactory()
-       
+        
+        imageView.layer.cornerRadius = 20
         yesButton.layer.cornerRadius = 15
         yesButton.clipsToBounds = true
+        statisticService = StatisticService()
+        
+        let factory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        self.questionFactory = factory
+        
+        showLoadingIndicator()
+        factory.loadData()
     }
 
     // MARK: - Actions
@@ -49,8 +56,7 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Setup
 
     private func setupQuestionFactory() {
-        let questionFactory = QuestionFactory()
-        questionFactory.delegate = self
+        let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         self.questionFactory = questionFactory
         self.questionFactory?.requestNextQuestion()
     }
@@ -64,8 +70,8 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Mapping
 
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        QuizStepViewModel(
-            imageName: UIImage(named: model.imageName) ?? UIImage(),
+        return QuizStepViewModel(
+            imageName: UIImage(data: model.imageName) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
@@ -163,12 +169,54 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
 
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question else { return }
-
-        currentQuestion = question
-        let viewModel = convert(model: question)
-
         DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
+            guard let self else { return }
+            self.hideLoadingIndicator()
+            self.currentQuestion = question
+            let viewModel = convert(model: question)
+            self.show(quiz: viewModel)
         }
     }
+    
+    func didLoadDataFromServer() {
+        DispatchQueue.main.async { [weak self] in
+            self?.hideLoadingIndicator()
+            self?.questionFactory?.requestNextQuestion()}
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+    
+    // MARK: - Activity Indicator
+
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    private func showNetworkError(message: String) {
+        hideLoadingIndicator()
+        
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            self.questionFactory?.requestNextQuestion()
+        }
+        
+        alertPresenter.show(in: self, model: model)
+    }
 }
+
+
