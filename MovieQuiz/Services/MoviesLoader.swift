@@ -12,7 +12,11 @@ protocol MoviesLoading {
 }
 
 struct MoviesLoader: MoviesLoading {
-    private let networlClient = NetworkClient()
+    private let networkClient: NetworkRoutingProtocol
+    
+    init(networkClient: NetworkRoutingProtocol = NetworkClient()) {
+          self.networkClient = networkClient
+      }
     
     private var mostPopularMoviesUrl: URL {
         guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_j4r66gt6") else {
@@ -22,7 +26,7 @@ struct MoviesLoader: MoviesLoading {
     }
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
-        networlClient.fetch(url: mostPopularMoviesUrl) { result in
+        networkClient.fetch(url: mostPopularMoviesUrl) { result in
             switch result {
             case.success(let data):
                 do {

@@ -10,6 +10,8 @@ import Foundation
 final class QuestionFactory: QuestionFactoryProtocol {
     private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
+    private var movies: [MostPopularMovie] = []
+
     
     init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
         self.moviesLoader = moviesLoader
@@ -34,51 +36,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
-    private var movies: [MostPopularMovie] = []
-    /*
-     private let questions: [QuizQuestion] = [
-     QuizQuestion(
-     imageName: "The Godfather",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "The Dark Knight",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "Kill Bill",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "The Avengers",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "Deadpool",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "The Green Knight",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: true),
-     QuizQuestion(
-     imageName: "Old",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: false),
-     QuizQuestion(
-     imageName: "The Ice Age Adventures of Buck Wild",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: false),
-     QuizQuestion(
-     imageName: "Tesla",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: false),
-     QuizQuestion(
-     imageName: "Vivarium",
-     text: "Рейтинг этого фильма больше чем 6?",
-     correctAnswer: false)
-     ]
-     */
     
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
@@ -96,10 +53,11 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 print("Failed to load image")
             }
             
-            let rating = Float(movie.rating) ?? 0
+            let randomRating = Int.random(in: 6...8)
+            let isMoreThan = Bool.random()
             
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+            let text = isMoreThan ? "Рейтинг этого фильма больше чем \(randomRating)?" : "Рейтинг этого фильма меньше чем \(randomRating)?"
+            let correctAnswer = isMoreThan ? randomRating > Int(Float(randomRating)) : randomRating < Int(Float(randomRating))
             
             let question = QuizQuestion(imageName: imageData,
                                         text: text,
