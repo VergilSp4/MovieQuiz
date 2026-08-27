@@ -57,7 +57,8 @@ final class QuestionFactory: QuestionFactoryProtocol {
             let isMoreThan = Bool.random()
             
             let text = isMoreThan ? "Рейтинг этого фильма больше чем \(randomRating)?" : "Рейтинг этого фильма меньше чем \(randomRating)?"
-            let correctAnswer = isMoreThan ? randomRating > Int(Float(randomRating)) : randomRating < Int(Float(randomRating))
+            guard let movieRating = Float(movie.rating) else { return }
+            let correctAnswer = isMoreThan ? movieRating > Float(randomRating) : movieRating < Float(randomRating)
             
             let question = QuizQuestion(imageName: imageData,
                                         text: text,

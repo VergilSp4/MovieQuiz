@@ -90,11 +90,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
                 let action = UIAlertAction(title: "Попробовать ещё раз",
                 style: .default) { [weak self] _ in
                     guard let self = self else { return }
-
+                    
+                    self.showLoadingIndicator()
                     self.presenter.restartGame()
                 }
 
             alert.addAction(action)
+        
+            self.present(alert, animated: true, completion: nil)
         }
 }
 

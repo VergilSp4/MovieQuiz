@@ -8,6 +8,16 @@
 import XCTest
 @testable import MovieQuiz
 
+final class QuestionFactoryDummy: QuestionFactoryProtocol {
+    func requestNextQuestion() {
+        
+    }
+    
+    func loadData() {
+        
+    }
+}
+
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
     var lastStepModel: QuizStepViewModel?
     
@@ -41,12 +51,10 @@ final class MovieQuizPresenterTests: XCTestCase {
         // Given
         let viewControllerMock = MovieQuizViewControllerMock()
         let statisticService = StatisticService()
-        let questionFactoryCreator: (QuestionFactoryDelegate) -> QuestionFactoryProtocol = { delegate in
-                    QuestionFactory(
-                        moviesLoader: MoviesLoader(),
-                        delegate: delegate
-                    )
-                }
+        let questionFactoryCreator: (QuestionFactoryDelegate) -> QuestionFactoryProtocol = { _ in
+            QuestionFactoryDummy()
+        }
+        
         let sut = MovieQuizPresenter(viewController: viewControllerMock,
                                      statisticService: statisticService,
                                      questionFactoryCreator: questionFactoryCreator)
