@@ -19,7 +19,6 @@ final class QuestionFactoryDummy: QuestionFactoryProtocol {
 }
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
-    var lastStepModel: QuizStepViewModel?
     
     func show(quiz step: QuizStepViewModel) {
         
